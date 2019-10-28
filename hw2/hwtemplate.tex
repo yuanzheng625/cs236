@@ -1,0 +1,155 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+\DeclareMathOperator{\E}{\mathbb{E}}
+
+\begin{document}
+
+\begin{center}
+{\Large CS 236 Fall 2019 Homework [1]}
+
+\begin{tabular}{rl}
+SUNet ID: & [zyuan84] \\
+Name: & [Zheng Yuan] \\
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+\section*{Problem 1: Proof}
+
+On the left hand side,
+ \begin{equation}
+ \E_{\hat p(x, y)} [\log{p_\theta(y|x)}] = \int_{x,y}{\hat p(x, y)}{\log{p_\theta(y|x)}}
+ \end{equation}
+
+On the right hand side,
+ \begin{equation}
+ \begin{split}
+ \E_{\hat p(x)} [D_{KL}(\hat p(y|x) || p_\theta(y|x))] &= \int_{x}{\hat p(x)}[D_{KL}(\hat p(y|x) || p_\theta(y|x))] \\
+  &= \int_{x}{\hat p(x)}[\int_{y}{\hat p(y|x) (\log{\hat p(y|x)} - \log{p_\theta(y|x)})} ]  \\
+  &= \int_{x}{\hat p(x)}  \int_{y}{\hat p(y|x)\log{\hat p(y|x)}} - \int_{x}{\hat p(x)}  \int_{y}{\hat p(y|x)\log{p_\theta(y|x)}} \\
+  & = \int_{x, y} {\hat p (x, y) \log \hat p(y|x)} - \int_{x, y} {\hat p (x, y) \log p_{\theta}(y|x)} \\
+  & \int_{x, y} {\hat p (x, y) \log \hat p(y|x)} - \E_{\hat p(x, y)} [\log{p_\theta(y|x)}] 
+ \end{split}
+ \end{equation}
+ 
+ where  the first term $\int_{x, y} {\hat p (x, y) \log \hat p(y|x)}$ is constant w.r.t $\theta$.
+ hence, 
+  \begin{equation}
+ \arg \max_{\theta} \E_{\hat p(x, y)} [\log{p_\theta(y|x)}] = \arg \min_{\theta} \E_{\hat p(x)} [D_{KL}(\hat p(y|x) || p_\theta(y|x))]
+ \end{equation}
+
+\section*{Problem 2: Proof}
+
+since $\sum_y \pi_y = 1$, Let
+ \begin{equation}
+ \pi_y = \frac {exp(r_y)}{\sum_j exp(r_j)}
+\end{equation}
+
+ \begin{equation}
+\begin{split}
+p_{\theta} (y|x) &= \frac{p_{\theta} (y, x)}{p_{\theta} (x)} =  \frac{p_{\theta} (x | y) p_{\theta} (y) }{ \sum_{y} {p_{\theta} (x | y) p_{\theta} (y) }  }  \\
+&=  \frac{ \mathcal{N} (x | \mu_y, \sigma^2 I)  \pi_y}{ \sum_{y} {\mathcal{N} (x | \mu_y, \sigma^2 I)  \pi_y}} \\
+&= \frac {\frac{1}{\sqrt{2\pi} \sigma} exp (-\frac{(x- \mu_y)^T(x- \mu_y)}{\sigma^2}) \pi_y }{\sum_y{ \frac{1}{\sqrt{2\pi} \sigma} exp (-\frac{(x- \mu_y)^T(x- \mu_y)}{\sigma^2}) \pi_y   }} \\
+& = \frac { exp (-\frac{(x- \mu_y)^T(x- \mu_y)}{\sigma^2}) \pi_y }{\sum_i {exp (-\frac{(x- \mu_i)^T(x- \mu_i)}{\sigma^2}) \pi_i }    } \\
+& = \frac { exp (-\frac{(x- \mu_y)^T(x- \mu_y)}{\sigma^2}) \frac {exp(r_y)}{\sum_j exp(r_j)} }{\sum_i {exp (-\frac{(x- \mu_i)^T(x- \mu_i)}{\sigma^2}) \frac {exp(r_i)}{\sum_j exp(r_j)}}    } \\ 
+&= \frac { exp (-\frac{(x- \mu_y)^T(x- \mu_y)}{\sigma^2} + r_y) }{\sum_i {exp (-\frac{(x- \mu_i)^T(x- \mu_i)}{\sigma^2} + r_i) }  } \\
+&= \frac{exp (-\frac{x^Tx}{\sigma^2}) exp (\frac{ 2x^T\mu_y - \mu_y^T\mu_y     }{\sigma^2} + r_y)}{ exp (-\frac{x^Tx}{\sigma^2}) \sum_i { exp (\frac{ 2x^T\mu_i - \mu_i^T\mu_i     }{\sigma^2} + r_i)}        } \\ 
+&= \frac{exp (\frac{ 2x^T\mu_y - \mu_y^T\mu_y     }{\sigma^2} + r_y)}{ \sum_i { exp (\frac{ 2x^T\mu_i - \mu_i^T\mu_i    }{\sigma^2} + r_i)}        }
+\end{split}
+\end{equation}
+Let $w_i =  \frac{2\mu_i }{\sigma^2} $ and $b_i = \frac{ - \mu_i^T\mu_i  }{\sigma^2} + r_i$
+
+\begin{equation}
+	p_{\theta} (y|x) = \frac{exp(x^T w_y + b_y)}{\sum_i{exp(x^T w_i + b_i)}} = p_{\gamma}(y|x)
+\end{equation}
+
+Hence, for any choice of $\theta$, there exists $\gamma$.
+
+
+\section*{Problem 3: Proof}
+\begin{enumerate}
+	\item 
+	The number of parameters is $\prod_i^n{k_i} - 1$
+	
+	\item 
+	
+	\begin{equation}
+	\begin{split}
+	p(X_1, X_2, ..., X_n) &= p(X_1)p(X_2| X_1) p(X_3|X_2, X_1)...p(X_i|X_{i-1}, ..., X_1)...p(X_n|X_{n-1},...,X_1) \\
+	&= p(X_1)p(X_2|X_1)...p(X_{m+1}|X_m,...,X_1)...p(X_i|X_{i-1}, ..., X_{i-m})...p(X_n|X_{n-1},..., X_{n-m}))
+	\end{split}
+	\end{equation}
+	
+	hence, the number of parameters is,
+	
+	\begin{equation}
+	\begin{split}
+	& (k_1 - 1) + k_1(k_2-1) + k_1k_2(k_3-1) + ... + k_1k_2...(k_m-1) + \sum_{i=m+1}^n k_{i-m}...(k_i-1) \\
+	&= \sum_{i =1}^m ((k_i-1)\prod_{j=1}^{i-1}{k_j} ) + \sum_{i =m+1}^n ((k_i-1)\prod_{j=i-m}^{i-1}{k_j} )
+	\end{split}
+	\end{equation}
+
+	\item if $m=0$, e.q. for any $X_i$, it is independent from all ancestors, we can have the number of parameters is $\sum_{i=1}^n{(k_i-1)}$
+\end{enumerate}
+
+\section*{Problem 4: Proof}
+
+When $n=2$, 
+\begin{equation}
+\begin{split}
+p_f(x_1, x_2) &= p_f(x_2|x_1)*p_f(x_1) \\
+&= \mathcal{N}(\mu_2(x_1), \sigma_2(x_1)) * \mathcal{N}(\mu_1, \sigma_1) \\
+p_r(x_1, x_2) &= p_r(x_1|x_2)*p_r(x_2) \\
+&= \mathcal{N}(\hat{\mu_1}(x_2), \hat{\sigma_1}(x_2)) * \mathcal{N}(\hat{\mu_2}, \hat{\sigma_2}) \\
+\end{split}
+\end{equation}
+
+Since $\hat{\mu_1}, \hat{\sigma_1},\hat{\mu_2}, \hat{\sigma_2}$ can be any function, for any $\mu_1, \sigma_1, \mu_2, \sigma_2$, we can choose a set of $\hat{\mu_1}, \hat{\sigma_1},\hat{\mu_2}, \hat{\sigma_2}$ s.t. $\mu_1=\hat{\mu_1}$, $\sigma_1=\hat{\sigma_1}$, $\mu_2=\hat{\mu_2}$ and $\sigma_2=\hat{\sigma_2}$. hence $p_f(x_1, x_2)  = p_r(x_1, x_2)$.
+
+the same logic applies to the cases when $n>2$.
+
+\section*{Problem 5: Proof}
+
+Per the definition of unbiased estimator  $\E[\hat{\theta}] = \theta$,
+\begin{enumerate}
+	\item 
+	\begin{equation}
+	\begin{split}
+	\E[A(z^{(1)}, ...,  A(z^{(k)})  ]	&= E[ \frac{1}{k} * \sum_{i=1}^k{p(x|z^{(i)})   }   ] \\
+	&= \frac{1}{k} * \sum_{i=1}^k{E[p(x|z^{(i)})  ]} \\
+	&= \frac{1}{k} * \sum_{i=1}^k{\int_{z^{(i)}}p(z^{(i)})p(x|z^{(i)})}  \\
+	& = \frac{1}{k} * \sum_{i=1}^k{p(x)} \\
+	&= p(x) \\
+	\end{split}
+	\end{equation}
+	
+	\item biased because, due to Jensen inequality,
+	\begin{equation}
+	\begin{split}
+	\E[\log{A(z^{(1)}, ...,  A(z^{(k)}) } ]	&<= \log{\E[A(z^{(1)}, ...,  A(z^{(k)})  ] } \\
+	&= \frac{1}{k} * \sum_{i=1}^k{E[p(x|z^{(i)})  ]} \\
+	&= \log{p(x)} \\
+	\end{split}
+	\end{equation}
+\end{enumerate}
+
+\section*{Problem 6: Solution}
+\begin{enumerate}
+	\item 
+	\begin{equation}
+	2^{15} = 32687 < 50257 < 65536 = 2^{16}
+	\end{equation}
+so, the minimal number of bits to represent the token is 16.
+	
+	
+	\item
+	
+	the old embedding layer shape is $50257 \times 768$, while the new embedding layer shape is $60000 \times 768$. The size of GPT-2 won't change. FC layer shape will change from $768 \times 50257$ to $768 \times 60000$. Softmax layer won't change. So total number of new parameters is $2\times768\times(60000-50257) = 14965248$.
+	
+	
+	
+\end{enumerate}
+
+\end{document}

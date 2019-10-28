@@ -39,9 +39,6 @@ class FSVAE(nn.Module):
         ################################################################################
         # Duplicate y based on x's batch size. Then duplicate x
         # This enumerates all possible combination of x with labels (0, 1, ..., 9)
-        y = np.repeat(np.arange(self.y_dim), x.size(0))
-        y = x.new(np.eye(self.y_dim)[y])
-        x = ut.duplicate(x, self.y_dim)
         
         qm, qv = self.enc.encode(x, y)
         z = ut.sample_gaussian(qm, qv)

@@ -56,9 +56,9 @@ class SSVAE(nn.Module):
         y_prob = torch.softmax(y_logits, dim=1) # (batch, y_dim)
         
         p_y = 1/10*torch.ones_like(y_prob)
-        
         kl_y = torch.mean(ut.kl_cat(y_prob, y_logprob, torch.log(p_y)), dim=0)
         
+        batch_size = x.shape[0]
         # Duplicate y based on x's batch size. Then duplicate x
         # This enumerates all possible combination of x with labels (0, 1, ..., 9)
         y = np.repeat(np.arange(self.y_dim), x.size(0))
@@ -68,9 +68,16 @@ class SSVAE(nn.Module):
         qm, qv = self.enc.encode(x, y)
         z = ut.sample_gaussian(qm, qv)
         recon_logits = self.dec.decode(z, y)
-        rec = -torch.mean(ut.log_bernoulli_with_logits(x, recon_logits), dim=0)
         
-        kl_z = torch.mean(ut.kl_normal(qm, qv, self.z_prior_m, self.z_prior_v), dim=0)
+        p_x_given_yz = ut.log_bernoulli_with_logits(x, recon_logits)
+        p_x_given_yz = p_x_given_yz.reshape(self.y_dim, batch_size).transpose(0, 1) #[batch, 10]
+        
+        rec = -torch.mean(torch.sum(p_x_given_yz*y_prob, dim=1), dim=0)
+        
+        kl_z_over_xy = ut.kl_normal(qm, qv, self.z_prior_m, self.z_prior_v)
+        kl_z_over_xy = kl_z_over_xy.reshape(self.y_dim, batch_size).transpose(0, 1)
+        
+        kl_z = torch.mean(torch.sum(kl_z_over_xy*y_prob, dim=1), dim=0)
         
         nelbo = rec + kl_y + kl_z
         

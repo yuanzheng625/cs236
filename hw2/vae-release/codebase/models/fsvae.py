@@ -74,3 +74,8 @@ class FSVAE(nn.Module):
     def sample_z(self, batch):
         return ut.sample_gaussian(self.z_prior[0].expand(batch, self.z_dim),
                                   self.z_prior[1].expand(batch, self.z_dim))
+        
+    def sample_x_given_yz(self, z, y):
+        recon_m = self.compute_mean_given(z, y)
+        dist = Normal(loc=recon_m, scale=1/10*torch.ones_like(recon_m))
+        return dist.sample()

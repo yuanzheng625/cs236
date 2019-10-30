@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 parser.add_argument('--iter_max',  type=int, default=1000000, help="Number of training iterations")
 parser.add_argument('--iter_save', type=int, default=10000,   help="Save model every n iterations")
 parser.add_argument('--run',       type=int, default=0,       help="Run ID. In case you want to run replicates")
+parser.add_argument('--train',     type=int, default=0,       help="Flag for training")
+
 args = parser.parse_args()
 layout = [
     ('model={:s}',  'fsvae'),
@@ -25,14 +27,18 @@ print('Model name:', model_name)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 train_loader, labeled_subset, test_set = ut.get_svhn_data(device)
 fsvae = FSVAE(name=model_name).to(device)
-writer = ut.prepare_writer(model_name, overwrite_existing=True)
 
-train(model=fsvae,
-      train_loader=train_loader,
-      labeled_subset=labeled_subset,
-      device=device,
-      y_status='fullsup',
-      tqdm=tqdm.tqdm,
-      writer=writer,
-      iter_max=args.iter_max,
-      iter_save=args.iter_save)
+if args.train:
+    writer = ut.prepare_writer(model_name, overwrite_existing=True)
+    train(model=fsvae,
+          train_loader=train_loader,
+          labeled_subset=labeled_subset,
+          device=device,
+          y_status='fullsup',
+          tqdm=tqdm.tqdm,
+          writer=writer,
+          iter_max=args.iter_max,
+          iter_save=args.iter_save)
+else:
+    ut.load_model_by_name(fsvae, global_step=args.iter_max, device=device)
+    ut.sample_x_given_yz_plot(fsvae, num_z=20, global_step=args.iter_max)

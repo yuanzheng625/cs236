@@ -44,6 +44,31 @@ def sample_x_plot(model, row, col, global_step):
     
     fig.savefig(image_path, dpi=160)
     plt.close(fig)
+    
+def sample_x_given_yz_plot(model, num_z, global_step):
+    fig, axarr = plt.subplots(10, num_z)
+    
+    z = model.sample_z(batch=num_z)
+    
+    for i in range(10):
+        for j in range(num_z):
+            y = torch.zeros(1, 10)
+            y[:, i] = 1
+            x = model.sample_x_given_yz(z[j].unsqueeze(dim=0), y)
+            assert x.shape[1] == 3072
+            x = x[0]
+            x = x.reshape((3, 32, 32))
+            x = x.permute(1, 2, 0)
+            x = x.detach().numpy()
+            axarr[i,j].set_axis_off()
+            axarr[i,j].imshow(x)
+
+    image_path = os.path.join('checkpoints',
+                             model.name,
+                             'x-plot-{:05d}.png'.format(global_step))
+    
+    fig.savefig(image_path, dpi=160)
+    plt.close(fig)
 
 def sample_gaussian(m, v):
     """

@@ -10,7 +10,7 @@ from pprint import pprint
 from torchvision import datasets, transforms
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--gw',        type=int, default=1,     help="Weight on the generative terms")
+parser.add_argument('--gw',        type=int, default=0,     help="Weight on the generative terms")
 parser.add_argument('--cw',        type=int, default=100,   help="Weight on the class term")
 parser.add_argument('--iter_max',  type=int, default=30000, help="Number of training iterations")
 parser.add_argument('--iter_save', type=int, default=10000, help="Save model every n iterations")

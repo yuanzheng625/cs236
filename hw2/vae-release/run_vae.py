@@ -14,13 +14,14 @@ parser.add_argument('--z',         type=int, default=10,    help="Number of late
 parser.add_argument('--iter_max',  type=int, default=20000, help="Number of training iterations")
 parser.add_argument('--iter_save', type=int, default=10000, help="Save model every n iterations")
 parser.add_argument('--run',       type=int, default=0,     help="Run ID. In case you want to run replicates")
-parser.add_argument('--train',     type=int, default=0,     help="Flag for training")
+parser.add_argument('--train',     type=int, default=1,     help="Flag for training")
 args = parser.parse_args()
 layout = [
     ('model={:s}',  'vae'),
     ('z={:02d}',  args.z),
     ('run={:04d}', args.run)
 ]
+# test1
 model_name = '_'.join([t.format(v) for (t, v) in layout])
 pprint(vars(args))
 print('Model name:', model_name)

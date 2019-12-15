@@ -89,7 +89,7 @@ def loss_wasserstein_gp(g, d, x_real, *, device):
             d.forward(x_g).mean() + \
             10*((torch.norm(Jacobian, p=2, dim=1)-1)**2).mean()
             
-    g_loss = -F.logsigmoid(d.forward(x_g)).mean()    
+    g_loss = -d.forward(x_g).mean()    
     
     # raise NotImplementedError
     # YOUR CODE ENDS HERE
